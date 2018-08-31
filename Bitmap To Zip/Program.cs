@@ -8,39 +8,6 @@ namespace Bitmap_To_Zip
 {
     class BitmapListToZip
     {
-        // DEBUG CODE
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Now running...");
-
-            List<Bitmap> myBitmapList = new List<Bitmap>();
-
-            // Load test images
-            string[] imageFiles = Directory.GetFiles("C:\\Users\\jonty\\Desktop\\Testing\\");
-            int count = 1;
-            foreach (string file in imageFiles) 
-            {
-                try
-                {
-                    myBitmapList.Add(new Bitmap(file));
-                } catch (OutOfMemoryException ex)
-                {
-                    Console.WriteLine("Was able to get " + count + " of " + imageFiles.Length);
-                    Console.ReadKey();
-                    return;
-                }
-                
-                count += 1;
-            }
-
-            // Example usage
-            BitmapListToZip bitmapConverter = new BitmapListToZip();
-            bitmapConverter.ConvertBitmapListToZip(myBitmapList, "C:\\Users\\jonty\\Desktop\\", zipPassword: "Bob");
-
-            Console.WriteLine("It ran!");
-            Console.ReadKey();
-        }
-
         /// <summary>
         /// Writes a list of bitmap images to a temporary directory which is then turned into a zip.
         /// </summary>
