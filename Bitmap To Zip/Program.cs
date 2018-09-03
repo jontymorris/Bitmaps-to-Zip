@@ -2,12 +2,15 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using Ionic.Zip;
 
 namespace Bitmap_To_Zip
 {
+
     class BitmapListToZip
     {
+
         /// <summary>
         /// Writes a list of bitmap images to a temporary directory which is then turned into a zip.
         /// </summary>
@@ -17,18 +20,7 @@ namespace Bitmap_To_Zip
         /// <param name="zipPassword">Password that will be used to lock the zip file. If empty, then no password will be applied.</param>
         public void ConvertBitmapListToZip(List<Bitmap> bitmapList, string outputPath = "./", string zipName = "ImageZip", string zipPassword = "")
         {
-            // Create the temp directory
-            string tempPath = CreateTempFolder(zipName);
-
-            // Write the bitmaps to the temp directory
-            int index = 0;
-            foreach (Bitmap bitmap in bitmapList)
-            {
-                bitmap.Save(Path.Combine(tempPath, FormatIndex(index)));
-                index += 1;
-            }
-
-            // Zip up the temp directory and save to desired path
+            // Create the zip directory
             using (ZipFile zip = new ZipFile())
             {
                 // Check if a zip password was provided
@@ -37,50 +29,39 @@ namespace Bitmap_To_Zip
                     zip.Password = zipPassword;
                 }
 
-                zip.AddDirectory(tempPath);
-                zip.Save(Path.Combine(outputPath, zipName + ".zip"));
-            }
-
-            // Delete the temp directory
-            Directory.Delete(tempPath, true);
-        }
-        
-        /// <summary>
-        /// Creates a folder in the temporary directory location.
-        /// </summary>
-        /// <param name="folderName">Name of the temporary directory</param>
-        /// <returns>Full path of the new temporary directory.</returns>
-        private string CreateTempFolder(string folderName)
-        {
-            string tempPath = Path.Combine(Path.GetTempPath(), folderName);
-
-            // Check if there is already a temp directory
-            if (Directory.Exists(tempPath))
-            {
-                // Try and delete the temp directory
-                try
+                // Add all the bitmaps to the zip
+                for (int i=0; i<bitmapList.Count; i++)
                 {
-                    Directory.Delete(tempPath, true);
-                } catch (IOException exp)
-                {
-                    Console.WriteLine(exp);
+                    zip.AddEntry(FormatIndex(i), ImageToByte(bitmapList[i]));
                 }
                 
+                // Save the zip file
+                zip.Save(Path.Combine(outputPath, zipName + ".zip"));
             }
-
-            Directory.CreateDirectory(tempPath);
-            return tempPath;
         }
-        
+
+        /// <summary>
+        /// Converts an image to bytes
+        /// </summary>
+        /// <returns></returns>
+        private byte[] ImageToByte(Image image)
+        {
+            using (var stream = new MemoryStream())
+            {
+                image.Save(stream, ImageFormat.Png);
+                return stream.ToArray();
+            }
+        }
+
         /// <summary>
         /// Formats the given index as a file name.
         /// </summary>
-        /// <param name="index">Index that will be formatted</param>
         /// <returns></returns>
         private string FormatIndex(int index)
         {
             string format = index.ToString();
 
+            // Calculate how many digits need to be added
             int neededDigits = 7 - format.Length;
             if (neededDigits > 0)
             {
@@ -94,4 +75,5 @@ namespace Bitmap_To_Zip
         }
         
     }
+
 }

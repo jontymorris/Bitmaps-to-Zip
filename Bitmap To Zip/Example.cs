@@ -13,7 +13,7 @@ namespace Bitmap_To_Zip
             List<Bitmap> myBitmapList = new List<Bitmap>();
 
             // Psuedo code for loading bitmaps 
-            for (int i=0; i<10; i++)
+            for (int i = 0; i < 10; i++)
             {
                 myBitmapList.Add(new Bitmap("bitmap" + i + ".png"));
             }
